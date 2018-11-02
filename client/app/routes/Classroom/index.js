@@ -584,6 +584,9 @@ class Classroom extends React.Component {
       this.state.studentList.map(item => {
         result.push((
           <Window 
+            onDoubleClick={_ => {
+              console.log('dbl test' ,this.$rtc.setRemoteVideoStreamType(item.uid, 0))
+            }}
             key={item.uid} 
             uid={item.uid}
             isLocal={item.uid === this.$client.user.uid}
@@ -803,7 +806,7 @@ class Window extends React.Component {
       );
     } else if (this.props.role === 'student') {
       return (
-        <div className="student-window">
+        <div onDoubleClick={this.props.onDoubleClick} className="student-window">
           <div className="student-video" id={`video-${this.props.uid}`}>
             <Spin className={loaderClass} />
           </div>

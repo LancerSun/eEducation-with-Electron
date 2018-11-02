@@ -148,7 +148,7 @@ export default class ExampleDataProvider extends BaseDataProvider {
                 ts = 0
               }
               // min
-              if ((now - ts) / 1000 > 60) {
+              if ((now - ts) / 1000 > 10) {
                 resolve();
               } else {
                 reject(new Error('Teacher exists!'));
