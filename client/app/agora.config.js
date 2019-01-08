@@ -1,1 +1,1 @@
-export const APP_ID = 'aab8b8f5a8cd4469a63042fcfafe7063'; // appid obtained from https://dashboard.agora.io/signin/
+export const APP_ID = '9e14de08375540879378a5bfa65c9c50'; // appid obtained from https://dashboard.agora.io/signin/
