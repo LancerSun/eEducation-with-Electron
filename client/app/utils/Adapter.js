@@ -9,22 +9,22 @@ import Whiteboard from './Whiteboard';
 
 /**
  * Default screen-share stream's id
- * @constant SHARE_ID 
+ * @constant SHARE_ID
  */
 const SHARE_ID = 2
 
 /**
  * A class representing Adapter.
- * Adapter is not another sdk, but a flexible, light-weight 
+ * Adapter is not another sdk, but a flexible, light-weight
  * encapsulation for Agora Electron sdk for E-edu,
  * easier to use and extend.
- * @class Adapter 
+ * @class Adapter
  */
 export default class Adapter extends EventEmitter {
   /**
    * Encapsulation regular profile you need to set
    * @param {boolean} audience if user is an audience
-   * @param {number} videoProfile videoProfile 
+   * @param {number} videoProfile videoProfile
    * @param {boolean} swapWidthAndHeight if swap width and height
    */
   initProfile(audience = false, videoProfile = 43, swapWidthAndHeight = false) {
@@ -139,9 +139,9 @@ export default class Adapter extends EventEmitter {
 
   /**
    * prepare screen share: initialize and join
-   * @param {string} token 
-   * @param {string} info 
-   * @param {number} timeout 
+   * @param {string} token
+   * @param {string} info
+   * @param {number} timeout
    */
   prepareScreenShare(token = null, info = '', timeout = 30000) {
     return new Promise((resolve, reject) => {
@@ -233,7 +233,7 @@ export default class Adapter extends EventEmitter {
    * uid is undefined => mute self
    * uid is number => mute target uid
    * uid is Array => mute target uids
-   * @param {number|number[]} uids 
+   * @param {number|number[]} uids
    */
   muteVideo(uids) {
     if (uids === undefined) {
@@ -260,7 +260,7 @@ export default class Adapter extends EventEmitter {
    * uid is undefined => unmute self
    * uid is number => unmute target uid
    * uid is Array => unmute target uids
-   * @param {number|number[]} uids 
+   * @param {number|number[]} uids
    */
   unmuteVideo(uids) {
     if (uids === undefined) {
@@ -287,7 +287,7 @@ export default class Adapter extends EventEmitter {
    * uid is undefined => mute self
    * uid is number => mute target uid
    * uid is Array => mute target uids
-   * @param {number|number[]} uids 
+   * @param {number|number[]} uids
    */
   muteAudio(uids) {
     if (uids === undefined) {
@@ -314,7 +314,7 @@ export default class Adapter extends EventEmitter {
    * uid is undefined => unmute self
    * uid is number => unmute target uid
    * uid is Array => unmute target uids
-   * @param {number|number[]} uids 
+   * @param {number|number[]} uids
    */
   unmuteAudio(uids) {
     if (uids === undefined) {
@@ -339,7 +339,7 @@ export default class Adapter extends EventEmitter {
 
   /**
    * broadcast message in channel
-   * @param {string} message 
+   * @param {string} message
    * @param {string} type - whether a 'str' or a 'json'
    */
   broadcastMessage(message = '', type = 'str') {
@@ -347,14 +347,14 @@ export default class Adapter extends EventEmitter {
       return
     }
     this.dataProvider.dispatch('broadcastMessage', {
-      message, 
-      user: this.user, 
+      message,
+      user: this.user,
       type
     })
   }
 
   /**
-   * 
+   *
    * @param {number} uid  target uid
    * @param {object} info new info you want to update
    */
@@ -414,7 +414,7 @@ export default class Adapter extends EventEmitter {
 
   // /**
   //  * demote a student to audience
-  //  * @param {number} uid 
+  //  * @param {number} uid
   //  */
   // demote(uid) {
   //   if(this.userList.hasOwnProperty(uid)) {
@@ -441,9 +441,9 @@ export default class Adapter extends EventEmitter {
   /**
    * @private
    * new a object only when both info and stream are set will callback be emit
-   * @param {number} uid 
-   * @param {function} onUserAdded 
-   * @param {function} onUserUpdated 
+   * @param {number} uid
+   * @param {function} onUserAdded
+   * @param {function} onUserUpdated
    */
   newUser(uid, onUserAdded, onUserUpdated) {
     let target = {
@@ -522,6 +522,7 @@ export default class Adapter extends EventEmitter {
     // } else {
     //   console.warn('Unknow role for user: ' + uid)
     // }
+    console.log(info)
     this.emit('user-added', uid, clone(info));
   }
 
@@ -534,15 +535,16 @@ export default class Adapter extends EventEmitter {
       this.user.username = nextInfo.username;
       this.user.role = nextInfo.role;
     }
+
     this.emit('user-updated', uid, clone(preInfo), clone(nextInfo));
   }
 
   /**
    * @private
    * add user to userlist
-   * @param {number} uid 
-   * @param {object} info 
-   * @param {object} stream 
+   * @param {number} uid
+   * @param {object} info
+   * @param {object} stream
    */
   addUser = (uid, info, stream) => {
     // if not exist, create one
@@ -557,7 +559,7 @@ export default class Adapter extends EventEmitter {
   /**
    * @private
    * remove user from userList and trigger related event
-   * @param {number} uid 
+   * @param {number} uid
    */
   removeUser(uid) {
     if(this.userList.hasOwnProperty(uid)) {
@@ -600,7 +602,7 @@ export default class Adapter extends EventEmitter {
       this._joinned = true;
       if(this.sharingInfo) {
         this.emit('screen-share-started', {
-          sharerId: this.sharingInfo.sharerId, 
+          sharerId: this.sharingInfo.sharerId,
           shareId: this.sharingInfo.shareId
         })
       };
@@ -610,7 +612,7 @@ export default class Adapter extends EventEmitter {
       this._joinned = true;
       if(this.sharingInfo) {
         this.emit('screen-share-started', {
-          sharerId: this.sharingInfo.sharerId, 
+          sharerId: this.sharingInfo.sharerId,
           shareId: this.sharingInfo.shareId
         })
       };

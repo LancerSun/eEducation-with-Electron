@@ -19,6 +19,76 @@ class Index extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.setInputBarValue()
+  }
+
+  setInputBarValue() {
+    document.querySelector('#channel').value = 'class4'
+    document.querySelector('#username').value = this.randomNum(5)
+    // this.login()
+  }
+
+  randomNum(n){
+    let rnd = ''
+    for(let i=0; i<n; i++)
+      rnd += Math.floor(Math.random()*10);
+    return rnd
+  }
+
+  login() {
+    let channel = document.querySelector('#channel').value,
+      username = document.querySelector('#username').value,
+      role = this.state.role;
+
+    if (!/^[0-9a-zA-Z]+$/.test(username)) {
+      return message.error('Username can only consist a-z | A-Z | 0-9!');
+    }
+
+    if (/^2$/.test(username)) {
+      return message.error('Username can not be 2!');
+    }
+
+    if (!/^[0-9a-zA-Z]+$/.test(channel)) {
+      return message.error('Channel can only consist a-z | A-Z | 0-9!');
+    }
+
+    if (/^null$/.test(channel)) {
+      return message.error('Channel can not be "null"!');
+    }
+
+    if (username.length > 8 || channel.length > 8) {
+      return message.error('The length of Channel/Username should be no longer than 8!');
+    }
+
+    // try to connect
+    this.setState({
+      isLogining: true
+    })
+    // you can do auth before init class to generate your custom uid
+    this.$client.initClass(APP_ID, channel, {uid: undefined, username, role}).then(({uid, boardId}) => {
+      // try to init whiteboard
+      this.$client.initWhiteboard(channel, boardId)
+      this.$client.initProfile(role === 'audience')
+      this.setState({
+        isLogining: false
+      }, () => {
+        if(role === 'audience') {
+          window.location.hash = 'classroom'
+        } else {
+          window.location.hash = 'device_testing';
+        }
+      })
+    }).catch(err => {
+      this.setState({
+        isLogining: false
+      }, () => {
+        console.error(err)
+        message.error('Failed to connect data provider: '+String(err))
+      })
+    })
+  }
+
   render() {
     let loading;
     if (this.state.isLogining) {
@@ -55,7 +125,7 @@ class Index extends React.Component {
                   </RadioGroup>
                 </FormItem>
                 <FormItem>
-                  <Button size="large" id="joinBtn" type="primary" htmlType="submit">
+                  <Button size="large" id="joinBtn" type="primary" htmlType="submit" onClick={this.login}>
                     Join ->
                   </Button>
                 </FormItem>
@@ -129,7 +199,7 @@ class Index extends React.Component {
         message.error('Failed to connect data provider: '+String(err))
       })
     })
-    
+
   }
 }
 

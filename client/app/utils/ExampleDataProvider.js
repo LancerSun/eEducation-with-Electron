@@ -18,8 +18,8 @@ export default class ExampleDataProvider extends BaseDataProvider {
    * connect to gun service and register events for data tunnel
    * also do validation and login
    * @param {string} appId - agora app id
-   * @param {string} channel - channel id 
-   * @param {string[]} serverUrls - gun service urls 
+   * @param {string} channel - channel id
+   * @param {string[]} serverUrls - gun service urls
    */
   connect (appId, channel, serverUrls = SERVER_URLS) {
     // default implement for connect
@@ -56,7 +56,7 @@ export default class ExampleDataProvider extends BaseDataProvider {
           }
         });
       });
-  
+
       Promise.all([userPromise, channelStatusPromise, messagePromise])
         .then(() => {
           // register event
@@ -91,7 +91,7 @@ export default class ExampleDataProvider extends BaseDataProvider {
 
   /**
    * log with prefix: `[Data Provider:]`
-   * @param {*} args 
+   * @param {*} args
    */
   log (...args) {
     console.log('[Data Provider:]', ...args)
@@ -126,10 +126,10 @@ export default class ExampleDataProvider extends BaseDataProvider {
   /**
    * connect and get class info, do validation
    * @private
-   * @param {string} payload.appId - agora app id 
-   * @param {string} payload.channel - channel id 
-   * @param {Object} payload.user - user object 
-   * @returns {Promise<T>} 
+   * @param {string} payload.appId - agora app id
+   * @param {string} payload.channel - channel id
+   * @param {Object} payload.user - user object
+   * @returns {Promise<T>}
    */
   dispatchInitClass({appId, channel, user}) {
     return new Promise((resolve, reject) => {
@@ -256,7 +256,7 @@ export default class ExampleDataProvider extends BaseDataProvider {
           }));
         }
 
- 
+
         Promise.all(promisesRegister).then(values => {
           const boardId = values[0];
           this.heartbeat = setInterval(() => {
@@ -281,7 +281,7 @@ export default class ExampleDataProvider extends BaseDataProvider {
   /**
    * leave the class and remove info
    * @private
-   * @param {Object} payload.user 
+   * @param {Object} payload.user
    */
   dispatchLeaveClass({user}) {
     if(user) {
@@ -298,7 +298,7 @@ export default class ExampleDataProvider extends BaseDataProvider {
    * @private
    * @param {number} payload.shareId - stream id for sharing stream
    * @param {number} payload.sharerId - the user who do the sharing
-   * @returns {Promise<T>} 
+   * @returns {Promise<T>}
    */
   dispatchStartScreenShare({shareId, sharerId}) {
     return new Promise((resolve, reject) => {
@@ -319,7 +319,7 @@ export default class ExampleDataProvider extends BaseDataProvider {
    * @private
    * @param {number} payload.shareId - stream id for sharing stream
    * @param {number} payload.sharerId - the user who do the sharing
-   * @returns {Promise<T>} 
+   * @returns {Promise<T>}
    */
   dispatchStopScreenShare({shareId, sharerId}) {
     return new Promise((resolve, reject) => {
@@ -336,10 +336,10 @@ export default class ExampleDataProvider extends BaseDataProvider {
   /**
    * broadcast message in the class
    * @private
-   * @param {string} payload.message 
-   * @param {Object} payload.user 
+   * @param {string} payload.message
+   * @param {Object} payload.user
    * @param {string} payload.type - whether a 'str' or a 'json'
-   * @returns {Promise<T>} 
+   * @returns {Promise<T>}
    */
   dispatchBroadcastMessage({message, user, type}) {
     return new Promise((resolve, reject) => {
@@ -363,7 +363,7 @@ export default class ExampleDataProvider extends BaseDataProvider {
   /**
    * update user info in class
    * @private
-   * @param {Object} payload.user 
+   * @param {Object} payload.user
    */
   dispatchUpdateUserInfo({user}) {
     return new Promise((resolve, reject) => {
@@ -459,11 +459,14 @@ export default class ExampleDataProvider extends BaseDataProvider {
     // sub user status changes
     this.userTunnel.map().on((info, uid) => {
       this.log('user info', uid, info)
+
       if(info === null) {
         this.emit('user-info-removed', {uid: Number(uid)})
       } else {
         this.emit('user-info-updated', {uid: Number(uid), info})
       }
+
+      this.emit('user-info-updated', {uid: Number(uid), info})
     })
     // sub channel status changes
     this.channelStatusTunnel.map().on((value, key) => {

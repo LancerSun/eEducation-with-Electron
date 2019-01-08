@@ -48,7 +48,8 @@ class Classroom extends React.Component {
       showWindowPicker: false,
       windowList: [],
       totalPage: 1,
-      currentPage: 1
+      currentPage: 1,
+      isScreenChange: false
     };
     this.enableChat = true;
   }
@@ -60,6 +61,14 @@ class Classroom extends React.Component {
     }
     this.subscribeClientEvents();
     this.subcribeWhiteboardEvents();
+    this.subscribeRemoteVideo(456789, false)
+    this.subscribeRemoteVideo(123456, false)
+  }
+
+  subscribeRemoteVideo = (uid, mute) => {
+    this.$rtc.muteRemoteVideoStream(uid, mute)
+    const studentScreenDom = document.getElementById(`remote${uid}`);
+    this.$rtc.subscribe(uid, studentScreenDom);
   }
 
   componentWillUnmount() {
@@ -81,6 +90,8 @@ class Classroom extends React.Component {
 
   subscribeClientEvents = () => {
     this.$client.on('user-added', (uid, info) => {
+      console.log('加入了'+uid)
+      console.log(uid+info)
       if (info.role === 'teacher') {
         // set to high stream
         this.$rtc.setRemoteVideoStreamType(uid, 0)
@@ -111,6 +122,7 @@ class Classroom extends React.Component {
       }
     });
     this.$client.on('user-updated', (uid, preInfo, nextInfo) => {
+      console.log('更新了'+uid)
       if (preInfo.role !== nextInfo.role) {
         if (preInfo.role === 'audience' && nextInfo.role === 'student') {
           if(uid === this.$client.user.uid) {
@@ -254,9 +266,9 @@ class Classroom extends React.Component {
           this.$client.muteVideo(uid)
         }
       } else if (action === 'enableAll') {
-        this.$client.unmuteVideo(this._getOtherStudents()) 
+        this.$client.unmuteVideo(this._getOtherStudents())
       } else if (action === 'disableAll') {
-        this.$client.muteVideo(this._getOtherStudents()) 
+        this.$client.muteVideo(this._getOtherStudents())
       } else {
         throw new Error('Invalid action')
       }
@@ -270,9 +282,9 @@ class Classroom extends React.Component {
           this.$client.muteAudio(uid)
         }
       } else if (action === 'enableAll') {
-        this.$client.unmuteAudio(this._getOtherStudents()) 
+        this.$client.unmuteAudio(this._getOtherStudents())
       } else if (action === 'disableAll') {
-        this.$client.muteAudio(this._getOtherStudents()) 
+        this.$client.muteAudio(this._getOtherStudents())
       } else {
         throw new Error('Invalid action')
       }
@@ -378,7 +390,7 @@ class Classroom extends React.Component {
       });
       return;
       // this.$client.startScreenShare();
-    } 
+    }
     this.$client.stopScreenShare();
     this.setState({
       waitSharing: true,
@@ -519,6 +531,12 @@ class Classroom extends React.Component {
     });
   }
 
+  handleScreenChange = () => {
+    this.setState({
+      isScreenChange: !this.state.isScreenChange
+    })
+  }
+
   render() {
     // get network status
     const profile = {
@@ -567,12 +585,12 @@ class Classroom extends React.Component {
       let result = []
       this.state.teacherList.map(item => {
         result.push((
-          <Window 
-            key={item.uid} 
+          <Window
+            key={item.uid}
             uid={item.uid}
             isLocal={item.uid === this.$client.user.uid}
             adapter={this.props.adapter}
-            username={item.username} 
+            username={item.username}
             role={item.role} />
         ))
       })
@@ -583,12 +601,12 @@ class Classroom extends React.Component {
       let result = []
       this.state.studentList.map(item => {
         result.push((
-          <Window 
-            key={item.uid} 
+          <Window
+            key={item.uid}
             uid={item.uid}
             isLocal={item.uid === this.$client.user.uid}
             adapter={this.props.adapter}
-            username={item.username} 
+            username={item.username}
             role={item.role} />
         ))
       })
@@ -684,8 +702,9 @@ class Classroom extends React.Component {
         </header>
         <section className="students-container">{students}</section>
         <section className="board-container">
+
           <div className="board" id="whiteboard" style={{ display: this.state.isSharing ? 'none' : 'block' }}>
-            { 
+            {
               Whiteboard.readyState === false ? (
               <div className="board-mask">
                 <span>Something wrong with Whiteboard service</span>
@@ -696,7 +715,7 @@ class Classroom extends React.Component {
                   <div style={{display: this.$client.user.role === 'audience'?'flex':'none'}} className="board-mask"></div>
                   <RoomWhiteboard room={room} style={{ width: '100%', height: '100vh' }} />
                   <div className="pagination">
-                    <Pagination 
+                    <Pagination
                       defaultCurrent={1}
                       current={this.state.currentPage}
                       total={this.state.totalPage}
@@ -707,11 +726,11 @@ class Classroom extends React.Component {
                 </React.Fragment>
               )
             }
-          
+
           </div>
           <div className="board" id="shareboard" />
           {
-            this.$client.user.role === 'audience' ? '' 
+            this.$client.user.role === 'audience' ? ''
             : <React.Fragment>
               <Toolbar
                 whiteboard={Whiteboard.readyState}
@@ -732,14 +751,18 @@ class Classroom extends React.Component {
           {teacher}
         </section>
 
-        <ClassControl
-          className="channel-container"
-          controllable={this.$client.user.username === this.state.teacher}
-          onSendMessage={this.handleSendMsg} 
-          onAction={this.handleClassCtrlAction}
-          messages={this.state.messageList.toArray()} 
-          users={this.state.studentList.toArray()} 
-        />
+        <div className="channel-container" id="remote123456" onClick={this.handleScreenChange} >
+          <div className="student-camera" id="remote456789" onClick={this.handleScreenChange} />
+        </div>
+
+        {/*<ClassControl*/}
+          {/*className="channel-container"*/}
+          {/*controllable={this.$client.user.username === this.state.teacher}*/}
+          {/*onSendMessage={this.handleSendMsg}*/}
+          {/*onAction={this.handleClassCtrlAction}*/}
+          {/*messages={this.state.messageList.toArray()}*/}
+          {/*users={this.state.studentList.toArray()}*/}
+        {/*/>*/}
 
       </div>
     );
